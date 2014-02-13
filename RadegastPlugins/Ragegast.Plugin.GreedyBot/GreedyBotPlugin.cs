@@ -239,22 +239,26 @@ namespace Ragegast.Plugin.GreedyBot
 		private bool isClickerThreadRunning = true;
 		bool isThreadComplete = false;
 		Thread workerThread = null;
-		private readonly object threadSyncObj = new object();
+		private readonly object workerThreadLock = new object();
 
 		private void StopThreadWork()
 		{
-			lock (threadSyncObj)
+			lock (workerThreadLock)
 			{
-				if (threadWork != null && threadWork.IsRunning())
+				if (threadWork != null)
 				{
 					threadWork.Stop();
-					OutputLine("Waiting for work to finish...");
+					OutputLine("StopThreadWork: PULSE to make the worker wake up and see that we've acknowledged the work has been completed", OutputLevel.Threading);
+					Monitor.Pulse(workerThreadLock);
+
 					while (threadWork != null)
 					{
-						Monitor.Wait(threadSyncObj);
+						OutputLine("StopThreadWork: WAIT for work to finish...", OutputLevel.Threading);
+						Monitor.Wait(workerThreadLock);
+						OutputLine("StopThreadWork: Wokeup", OutputLevel.Threading);
 					}
 
-					OutputLine("Work finished!");
+					OutputLine("StopThreadWork: Work finished, returning", OutputLevel.Threading);
 				}
 			}
 		}
@@ -265,16 +269,17 @@ namespace Ragegast.Plugin.GreedyBot
 			{
 				return;
 			}
-			lock (threadSyncObj)
+			lock (workerThreadLock)
 			{
-				OutputDebugString("Previous thread still running, joining it...");
+				OutputLine("KillPreviousThread: Previous thread still running, joining it...", OutputLevel.Game);
 				StopThreadWork();
 				isClickerThreadRunning = false;
-				Monitor.Pulse(threadSyncObj);
+				Monitor.Pulse(workerThreadLock);
 				while (!isThreadComplete)
 				{
-					OutputDebugString("Waiting for thread to end...");
-					Monitor.Wait(threadSyncObj);
+					OutputLine("KillPreviousThread: WAIT for thread to end...", OutputLevel.Threading);
+					Monitor.Wait(workerThreadLock);
+					OutputLine("KillPreviousThread: Wokeup", OutputLevel.Threading);
 				}
 				threadWork = null;
 			}
@@ -299,13 +304,11 @@ namespace Ragegast.Plugin.GreedyBot
 			{
 				this.objectLocalId = objectLocalId;
 				this.faceIndex = faceIndex;
-				this.isRunning = false;
+				this.isRunning = true;
 			}
 
 			public void Execute()
 			{
-				isRunning = true;
-				
 				instance.Client.Self.Grab(objectLocalId, Vector3.Zero, Vector3.Zero, Vector3.Zero, faceIndex, Vector3.Zero,
 										  Vector3.Zero, Vector3.Zero);
 				instance.Client.Self.DeGrab(objectLocalId, Vector3.Zero, Vector3.Zero, faceIndex, Vector3.Zero,
@@ -314,6 +317,7 @@ namespace Ragegast.Plugin.GreedyBot
 
 			public void Stop()
 			{
+				OutputLine("ThreadWork: Stopped!", OutputLevel.Threading);
 				isRunning = false;
 			}
 
@@ -325,56 +329,58 @@ namespace Ragegast.Plugin.GreedyBot
 
 		private void WorkerThreadLogic()
 		{
-			lock (threadSyncObj)
+			lock (workerThreadLock)
 			{
-			waitForMoreWork:
-				if (!isClickerThreadRunning)
-				{
-					//OutputDebugString("Thread shutting down...");
-					isThreadComplete = true;
-					Monitor.Pulse(threadSyncObj);
-					return;
-				}
-
-				//OutputDebugString("Waiting for work...");
-				threadWork = null;
-				Monitor.Pulse(threadSyncObj);
-				Monitor.Wait(threadSyncObj);
-
-				if (!isClickerThreadRunning)
-				{
-					//OutputDebugString("Thread shutting down...");
-					isThreadComplete = true;
-					Monitor.Pulse(threadSyncObj);
-					return;
-				}
-
-				if (threadWork == null)
-				{
-					throw new ApplicationException("*** GreedyBot ERROR: threadWork is NULL");
-				}
-
 				while (true)
 				{
-					OutputLine("Execute...");
-					threadWork.Execute();
-
-					for (int i = 0; i < 100; i++)
+					if (!isClickerThreadRunning)
 					{
-						if (!isClickerThreadRunning || !threadWork.IsRunning())
-						{
-							OutputLine("Done executing!");
-							goto waitForMoreWork;
-						}
-
-						Monitor.Exit(threadSyncObj);
-						Thread.Sleep(10);
-						Monitor.Enter(threadSyncObj);
+						// If clickerThreadRunning flag has been set to false then main is waiting for us to confirm that
+						//   this thread has completed (main's waiting on isThreadComplete to be set to true)
+						OutputLine("Worker: PULSE becuase we're finished", OutputLevel.Threading );
+						isThreadComplete = true;
+						Monitor.Pulse(workerThreadLock);
+						return;
 					}
+
+					// Main must wait for 'threadWork' to be set to null before it can schedule more work. Let main know
+					//   that we're done with the previous work.
+					OutputLine("Worker: PULSE we set threadWork to null and we're waiting for work", OutputLevel.Threading);
+					threadWork = null;
+					Monitor.Pulse(workerThreadLock);
+
+					while (isClickerThreadRunning && threadWork == null)
+					{
+						// Wait for main to schedule some more work for us *or* for main to stop this thread.
+						OutputLine("Worker: WAIT for more work...", OutputLevel.Threading);
+						Monitor.Wait(workerThreadLock);
+						OutputLine("Worker: Woke up", OutputLevel.Threading);
+						OutputLine("Worker: PULSE for acknowledgement that we woke up from the pulse", OutputLevel.Threading);
+						Monitor.Pulse(workerThreadLock);
+					}
+
+					OutputLine("Worker: (debug) " + isClickerThreadRunning + " Threadwork: " + ((threadWork == null) ? "Null" : "Yes"), OutputLevel.Threading);
+
+					while (isClickerThreadRunning && threadWork != null && threadWork.IsRunning())
+					{
+						// Keep executing our payload every 'retryDelayInMs' ms until main tells us to top
+						//   executing it. Main must notify us whenever it stops executing.
+						//OutputLine("Execute...");
+						OutputLine("Worker: Execute...", OutputLevel.Threading);
+						threadWork.Execute();
+						OutputLine("Worker: WAIT 2000ms", OutputLevel.Threading);
+						Monitor.Wait(workerThreadLock, 2000);
+						OutputLine("Worker: Wokeup", OutputLevel.Threading);
+					}
+					OutputLine("Worker: Done executing!", OutputLevel.Threading);
 				}
 			}
 		}
 
+		/// <summary>
+		/// Determines if all necessary game objects have been found to be able to start playing the game.
+		/// </summary>
+		/// <returns>True if we've found all necessary game objects.</returns>
 		private bool HasFoundAllGameComponents()
 		{
 			return diceLeftId != UUID.Zero 
@@ -447,7 +453,7 @@ namespace Ragegast.Plugin.GreedyBot
 				if (props.Name == "Game Player (" + instance.Client.Self.Name +")")
 				{
 					playerIndex = seatId - 1;
-					OutputLine("We're player #" + playerIndex);
+					OutputLine("We're player #" + playerIndex, OutputLevel.Game);
 				}
 			}
 
@@ -456,7 +462,7 @@ namespace Ragegast.Plugin.GreedyBot
 				instance.Client.Objects.ObjectProperties -= Objects_ObjectProperties;
 
 				currentState = State.WaitingForOurTurn;
-				OutputLine("Found everything!");
+				OutputLine("Found everything!", OutputLevel.Game);
 			}
 		}
 
@@ -513,6 +519,8 @@ namespace Ragegast.Plugin.GreedyBot
 				{
 					if (currentState != State.NotRunning)
 					{
+						OutputLine("Objects_AvatarSitChanged: Stopping thread work...", OutputLevel.Game);
+						StopThreadWork();
 						ClearGame();
 						//instance.Client.Self.RequestSit(sitTargetLamp, Vector3.Zero);
 					}
@@ -551,7 +559,6 @@ namespace Ragegast.Plugin.GreedyBot
 					}
 
 					instance.Client.Objects.ObjectPropertiesFamily -= Objects_ObjectPropertiesFamily;
-					OutputLine(e.Properties.ObjectID.ToString());
 
 					tableId = e.Properties.ObjectID;
 					GameLogic.IsSmallStraightEnabled = tablesWithSmallStraightRule.Contains(tableId);
@@ -560,7 +567,7 @@ namespace Ragegast.Plugin.GreedyBot
 					Primitive greedyGreedyTable = instance.Client.Network.CurrentSim.ObjectsPrimitives.Find(n => n.ID == tableId);
 					if (greedyGreedyTable == null)
 					{
-						OutputLine("Failed to find greedyGreedyTable!");
+						OutputLine("Failed to find greedyGreedyTable!", OutputLevel.Error);
 						return;
 					}
 
@@ -568,7 +575,7 @@ namespace Ragegast.Plugin.GreedyBot
 					uint[] greedyTableChildren = instance.Client.Network.CurrentSim.ObjectsPrimitives.FindAll(n => n.ParentID == greedyGreedyTable.LocalID).Select(n => n.LocalID).ToArray();
 					if (greedyTableChildren.Length > 0)
 					{
-						OutputLine("Requesting " + greedyTableChildren.Length);
+						OutputLine("Requesting " + greedyTableChildren.Length + " properties", OutputLevel.Game);
 
 						currentState = State.RetrievingGameObjectProperties;
 						instance.Client.Objects.ObjectProperties += Objects_ObjectProperties;
@@ -625,7 +632,7 @@ namespace Ragegast.Plugin.GreedyBot
 
 				if (e.Message == "It is not your turn. Please wait your turn before attempting to change the playing pieces.")
 				{
-					OutputLine("MSG 1: StopThreadWork");
+					OutputLine("Chat: Not our turn - StopThreadWork", OutputLevel.Game);
 					StopThreadWork();
 					game = null;
 					currentState = State.WaitingForOurTurn;
@@ -635,8 +642,7 @@ namespace Ragegast.Plugin.GreedyBot
 					// TODO: This is a hack... but it semes to be an OKAY hack! If we get this message then we actually have 0 points
 					//  and because we don't have a very reliable way to detect the end of the game yet to reset to 0 points we're just
 					//  going to use this to do it for us!
-					OutputLine("MSG 2: StopThreadWork");
-					StopThreadWork();
+					OutputLine("Chat: must get 1k points - scheduling roll", OutputLevel.Game);
 					myGameScore = 0;
 					ClickRoll();
 				}
@@ -644,8 +650,7 @@ namespace Ragegast.Plugin.GreedyBot
 				{
 					// TODO: Detect that this is the last round so we can use the correct algorithm in the game logic to pick our dice
 					//   for now we just keep trying to roll until we either exceed the opponets score or bust.
-					OutputLine("MSG 3: StopThreadWork");
-					StopThreadWork();
+					OutputLine("MSG 3: End of game must keep rolling till we win or bust - scheduling roll", OutputLevel.Game);
 					ClickRoll();
 				}
 			}
@@ -689,20 +694,20 @@ namespace Ragegast.Plugin.GreedyBot
 
 		#region TESTED_WORKING
 
-		/// <summary>
-		/// Outputs specified line to text chat (only local chat)
-		/// </summary>
-		internal void OutputLine()
+		internal enum OutputLevel
 		{
-			OutputLine(string.Empty);
+			Game,
+			Threading,
+			Error
 		}
 
 		/// <summary>
 		/// Outputs specified line to text chat (only local chat)
 		/// </summary>
-		internal void OutputLine(string msg)
+		internal static void OutputLine(string msg, OutputLevel outputType)
 		{
-			instance.TabConsole.MainChatManger.TextPrinter.PrintTextLine("DEBUG: " + msg, Color.CadetBlue);
+			OutputDebugString(instance.Client.Self.Name +  " [" + outputType + "] " + msg + "\n");
+			//instance.TabConsole.MainChatManger.TextPrinter.PrintTextLine("DEBUG: " + msg, Color.CadetBlue);
 		}
 		
 		/// <summary>
@@ -854,7 +859,7 @@ namespace Ragegast.Plugin.GreedyBot
 			{
 				if (currentDiceFaces[dieIndex] == null)
 				{
-					OutputLine("Current faces contains invalid data!");
+					OutputLine("Current faces contains invalid data!", OutputLevel.Error);
 					return null;
 				}
 
@@ -878,7 +883,7 @@ namespace Ragegast.Plugin.GreedyBot
 			Primitive targetObject = instance.Client.Network.CurrentSim.ObjectsPrimitives.Find(n => n.ID == objectId);
 			if (targetObject == null)
 			{
-				OutputLine("Failed to find object by UUID");
+				OutputLine("Failed to find object by UUID", OutputLevel.Error);
 				return;
 			}
 
@@ -892,13 +897,16 @@ namespace Ragegast.Plugin.GreedyBot
 		/// <param name="faceIndex">Index of face to click on the object</param>
 		private void ClickObjectFace(uint objectLocalId, int faceIndex)
 		{
-			lock (threadSyncObj)
+			lock (workerThreadLock)
 			{
-				OutputLine("ClickObjectFace: StopThreadWork");
+				OutputLine("ClickObjectFace: StopThreadWork", OutputLevel.Game);
 				StopThreadWork();
-				OutputLine("New threadwork");
+				OutputLine("ClickObjectFace: PULSE because new threadwork...", OutputLevel.Threading);
 				threadWork = new ThreadWorkClickFace(objectLocalId, faceIndex);
-				Monitor.PulseAll(threadSyncObj);
+				Monitor.Pulse(workerThreadLock);
+				OutputLine("ClickObjectFace: WAIT for thread to start working...", OutputLevel.Threading);
+				Monitor.Wait(workerThreadLock);
+				OutputLine("ClickObjectFace: woke up", OutputLevel.Threading);
 			}
 		}
 
@@ -943,10 +951,9 @@ namespace Ragegast.Plugin.GreedyBot
 		{
 			currentState = State.WaitingForOurTurn;
 			ClickObjectFace(gameButtonsId, 7);
-
-			// TODO: TEMP!!!
-			OutputLine("ClickStop: StopThreadWork");
-			StopThreadWork();
+			// TODO: score should change on stop, let's just use that as a quick hack to confirm we've stopped XD
+			//OutputLine("ClickStop: StopThreadWork");
+			//StopThreadWork();
 		}
 
 		/// <summary>
@@ -1055,8 +1062,13 @@ namespace Ragegast.Plugin.GreedyBot
 
 			//OutputLine("Score: " + pointsThisTurn);
 			//instance.Client.Self.Chat(pointsThisTurn.ToString(), 407407407, ChatType.Normal);
+
+			// TODO: this will likely cause some problems
+			OutputLine("OnScoreUpdate: stopping thread work...", OutputLevel.Game);
+			StopThreadWork();
 		}
 
+		
 		/// <summary>
 		/// A die on the game board has been updated.
 		/// </summary>
@@ -1075,26 +1087,24 @@ namespace Ragegast.Plugin.GreedyBot
 
 			if (currentState == State.SelectingDie)
 			{
-				OutputLine("OnDiceFaceUpdate: SelectingDie -> StopThreadWork");
-
-				StopThreadWork();
+				//OutputLine("OnDiceFaceUpdate: SelectingDie -> StopThreadWork", OutputLevel.Game);
+				OutputLine("OnDiceFaceUpdate: Detecting die change...", OutputLevel.Game);
 				DetectDieChange(previousDiceFaces);
 			}
 			else if (currentState == State.RollingDice)
 			{
-				OutputLine("OnDiceFaceUpdate: RollingDice -> StopThreadWork");
-				StopThreadWork();
-
 				if (!IsBoardReady())
 				{
 					return;
 				}
+				OutputLine("OnDiceFaceUpdate: RollingDice -> StopThreadWork", OutputLevel.Game);
+				StopThreadWork();
 
 				bool isBust = false;
 
 				if (game == null)
 				{
-					OutputLine(" ***** GAME IS NULL ***** ");
+					OutputLine(" ***** GAME IS NULL ***** ", OutputLevel.Error);
 					currentState = State.WaitingForOurTurn;
 					return;
 				}
@@ -1103,7 +1113,7 @@ namespace Ragegast.Plugin.GreedyBot
 				if (diceQueue.Count == 0)
 				{
 					pointsThisTurn = 0;
-					OutputLine("Busted!");
+					OutputLine("Busted!", OutputLevel.Game);
 					game = null;
 
 					currentState = State.WaitingForOurTurn;
@@ -1128,6 +1138,7 @@ namespace Ragegast.Plugin.GreedyBot
 				FaceStatus currentStatus = GetDieStatus(currentDiceFaces[i]);
 				if (previousStatus != currentStatus)
 				{
+					OutputLine("DetectDieChange: Die " + i + " went from " + previousStatus + " to " + currentStatus + ". Is our die = " + (i == dieIndexWereSelecting), OutputLevel.Game);
 					OnDieStatusChange(i, previousStatus, currentStatus);
 				}
 			}
@@ -1147,20 +1158,27 @@ namespace Ragegast.Plugin.GreedyBot
 				{
 					if (!continueRolling)
 					{
-						OutputLine("Game logic said we need to stop rolling");
+						//OutputLine("Game logic said we need to stop rolling");
 						myGameScore += pointsThisTurn;
 						pointsThisTurn = 0;
+						OutputLine("OnDieStatusChange: Schedule stop", OutputLevel.Game);
 						ClickStop();
 					}
 					else
 					{
+						OutputLine("OnDieStatusChange: Schedule roll", OutputLevel.Game);
 						ClickRoll();
 					}
 				}
 				else
 				{
+					OutputLine("OnDieStatusChange: Schedule select", OutputLevel.Game);
 					SelectDieFromQueue();
 				}
+			}
+			else
+			{
+				OutputLine("OnDieStatusChange: Don't care", OutputLevel.Game);
 			}
 		}
 
@@ -1179,6 +1197,7 @@ namespace Ragegast.Plugin.GreedyBot
 				expectedDiceStatus[i] = FaceStatus.New;
 			}
 
+			OutputLine("StartOurTurn: Schedule Roll", OutputLevel.Game);
 			ClickRoll();
 		}
 
@@ -1201,19 +1220,19 @@ namespace Ragegast.Plugin.GreedyBot
 			{
 				if (lightPrim.Text == null)
 				{
-					OutputLine("Lightprim.Text == null!");
+					OutputLine("UpdateLight: Lightprim.Text == null!", OutputLevel.Error);
 					return;
 				}
 				if (lightPrim.Textures == null)
 				{
-					OutputLine("lightPrim.Textures == null");
+					OutputLine("UpdateLight: lightPrim.Textures == null", OutputLevel.Error);
 					return;
 				}
 
 				string[] statusText = lightPrim.Text.Split(new char[] { '\n' });
 				if (statusText.Length < 2)
 				{
-					OutputLine("OutputText < 2!");
+					OutputLine("UpdateLight: OutputText < 2!", OutputLevel.Error);
 					return;
 				}
 
@@ -1221,12 +1240,12 @@ namespace Ragegast.Plugin.GreedyBot
 
 				if (lightPrim.Textures.GetFace(0).RGBA != ColorLightOff)
 				{
-					OutputLine("Turn started");
+					OutputLine("UpdateLight: Turn started", OutputLevel.Game);
 					StartOurTurn();
 				}
 				else
 				{
-					OutputLine("Turn ended");
+					OutputLine("UpdateLight: Turn ended", OutputLevel.Game);
 				}
 			}
 		}
