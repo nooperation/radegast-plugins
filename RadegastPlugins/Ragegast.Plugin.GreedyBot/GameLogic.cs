@@ -289,7 +289,7 @@ namespace Ragegast.Plugin.GreedyBot
 		/// <param name="marksAgainstUs">Number of consecutive busts we've had.</param>
 		/// <param name="isBust">[Out] Determines if we busted (TODO: REMOVE ME - DEBUG PURPOSES ONLY)</param>
 		/// <returns>True if we should continue rolling. False if we should select all the dice from diceQueue and en our turn.</returns>
-		public bool ChooseDiceToRoll(ref Queue<int> diceQueue, List<Die> activeDice, ref int score, int myGameScore, int marksAgainstUs, ref bool isBust)
+		public bool ChooseDiceToRoll(ref Queue<int> diceQueue, IEnumerable<Die> activeDice, ref int score, int myGameScore, int marksAgainstUs, ref bool isBust)
 		{
 			OutputLine("ChooseDiceToRoll(Score = " + score + ", myGameScore = " + myGameScore + ", marksAgainstUs =" + marksAgainstUs + ")");
 			diceQueue.Clear();

@@ -28,7 +28,7 @@ namespace LogicTester
 				int dieValue = 1 + (rand.Next()%6);
 
 			//	Console.Write(dieValue);
-				activeDice.Add(new Die(i, dieValue));
+				activeDice.Add(new Die(i, dieValue, Die.FaceStatus.New));
 			}
 			//OutuputLine("");
 			//OutuputLine("---------------------");

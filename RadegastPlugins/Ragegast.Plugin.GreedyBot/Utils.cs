@@ -25,8 +25,10 @@ namespace Ragegast.Plugin.GreedyBot
 		}
 
 		/// <summary>
-		/// Outputs specified line to text chat (only local chat)
+		/// Outputs the specified message as a debug string (via OutputDebugString).
 		/// </summary>
+		/// <param name="msg">Message to output.</param>
+		/// <param name="outputType">Type of output.</param>
 		public static void OutputLine(string msg, OutputLevel outputType)
 		{
 			OutputDebugString(GreedyBotPlugin.Instance.Client.Self.Name + " [" + outputType + "] " + msg + "\n");

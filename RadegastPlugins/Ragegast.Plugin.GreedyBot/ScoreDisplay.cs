@@ -25,6 +25,8 @@ namespace Ragegast.Plugin.GreedyBot
 			}
 		}
 
+		public Action<int> ScoreChanged;
+
 		/// <summary>
 		/// Table of expected UV corrdinates for each face of the score prim for each digit (0-9 followed by BLANK).
 		/// There are faces: 10000's, 1000's, 100's, 10's, 1's
@@ -70,8 +72,7 @@ namespace Ragegast.Plugin.GreedyBot
 				}
 			}
 
-			Utils.OutputLine("ScoreDisplay: Score = " + score, Utils.OutputLevel.Game);
-			GreedyBotPlugin.Instance.Client.Self.Chat(score.ToString(), 407407407, ChatType.Normal);
+			ScoreChanged(score);
 		}
 
 		/// <summary>
