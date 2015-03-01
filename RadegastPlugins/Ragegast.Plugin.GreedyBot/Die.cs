@@ -101,23 +101,33 @@ namespace Ragegast.Plugin.GreedyBot
 		/// <returns>Value of die (1-6)</returns>
 		private static int GetDieValueFromFace(Primitive.TextureEntryFace dieFace)
 		{
-			// <summary>
-			// 'U' offsets for each side of the die.
-			// All faces are on the same horizontal strip so no V offset is needed
-			// </summary>
+			// X 1 2 3
+			// 4 5 6  
+
 			float[] dieFaceUOffsets = new float[]
 			{
-				-0.4499954f,  // Side with value '1'
-				-0.3499863f,  // Side with value '2'
-				-0.2500076f,  // Side with value '3'
-				-0.1499985f,  // Side with value '4'
-				-0.04998932f, // Side with value '5'
-				0.04998932f	  // Side with value '6'
+				-0.1250038f, // Side with value '1'
+				0.1250038f, // Side with value '2'
+				0.3750114f, // Side with value '3'
+				-0.3750114f, // Side with value '4'
+				-0.1250038f, // Side with value '5'
+				0.1250038f, // Side with value '6'
+			};
+
+			float[] dieFaceVOffsets = new float[]
+			{
+				0.3750114f, // Side with value '1'
+				0.3750114f, // Side with value '2'
+				0.3750114f, // Side with value '3'
+				0.1250038f, // Side with value '4'
+				0.1250038f, // Side with value '5'
+				0.1250038f, // Side with value '6'
 			};
 
 			for (int dieIndex = 0; dieIndex < dieFaceUOffsets.Length; ++dieIndex)
 			{
-				if (Utils.IsAboutEqual(dieFace.OffsetU, dieFaceUOffsets[dieIndex]))
+				if (Utils.IsAboutEqual(dieFace.OffsetU, dieFaceUOffsets[dieIndex]) &&
+					Utils.IsAboutEqual(dieFace.OffsetV, dieFaceVOffsets[dieIndex]))
 				{
 					return dieIndex + 1;
 				}

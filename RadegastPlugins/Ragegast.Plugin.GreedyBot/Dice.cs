@@ -32,6 +32,22 @@ namespace Ragegast.Plugin.GreedyBot
 			Die[] previousDice = new Die[6];
 			currentDice.CopyTo(previousDice, 0);
 
+			//if (textures.GetFace(3) != null)
+			//{
+			//	Utils.OutputLine("Face " + (diceOffset + 3) + " = U:" + textures.GetFace(3).OffsetU + " V: " + textures.GetFace(3).OffsetV, Utils.OutputLevel.Game);
+
+			//	//currentDice[0 + diceOffset] = new Die(0 + diceOffset, textures.GetFace(3));
+			//}
+			//if (textures.GetFace(0) != null)
+			//{
+			//	Utils.OutputLine("Face " + (diceOffset + 0) + " = U:" + textures.GetFace(0).OffsetU + " V: " + textures.GetFace(0).OffsetV, Utils.OutputLevel.Game);
+			//	//currentDice[1 + diceOffset] = new Die(1 + diceOffset, textures.GetFace(0));
+			//}
+			//if (textures.GetFace(1) != null)
+			//{
+			//	Utils.OutputLine("Face " + (diceOffset + 1) + " = U:" + textures.GetFace(1).OffsetU + " V: " + textures.GetFace(1).OffsetV, Utils.OutputLevel.Game);
+			//	//currentDice[2 + diceOffset] = new Die(2 + diceOffset, textures.GetFace(1));
+			//}
 			if (textures.GetFace(3) != null)
 			{
 				currentDice[0 + diceOffset] = new Die(0 + diceOffset, textures.GetFace(3));

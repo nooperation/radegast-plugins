@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 using Ragegast.Plugin.GreedyBot;
 
 namespace LogicTester
@@ -17,21 +18,21 @@ namespace LogicTester
 
 		private List<Die> GetActiveDice(int dieCount)
 		{
-			//OutuputLine("");
-			//OutuputLine("------- Roll --------");
+			OutuputLine("");
+			OutuputLine("------- Roll --------");
 
 			List<Die> activeDice = new List<Die>();
 
-			//Console.Write("Dice: ");
+			Console.Write("Dice: ");
 			for (int i = 0; i < dieCount; i++)
 			{
 				int dieValue = 1 + (rand.Next()%6);
 
-			//	Console.Write(dieValue);
+				Console.Write(dieValue);
 				activeDice.Add(new Die(i, dieValue, Die.FaceStatus.New));
 			}
-			//OutuputLine("");
-			//OutuputLine("---------------------");
+			OutuputLine("");
+			OutuputLine("---------------------");
 
 			return activeDice;
 		}
@@ -39,7 +40,7 @@ namespace LogicTester
 		public Program()
 		{
 			int totalTurnToWin = 0;
-			int numRuns = 100000;
+			int numRuns = 100;
 
 			for (int i = 0; i < numRuns; ++i)
 			{
@@ -59,6 +60,7 @@ namespace LogicTester
 
 			int myGameScore = 0;
 			int marksAgainstUs = 0;
+
 			int totalTurns = 0;
 
 			while (myGameScore < 10000)
@@ -97,11 +99,11 @@ namespace LogicTester
 				if (isBust)
 				{
 					// We busted :x
-					//OutuputLine("*** Bust!");
+					OutuputLine("*** Bust!");
 
 					if (marksAgainstUs == 2)
 					{
-						//OutuputLine("Busted when marksAgainstUs == 2 (wtf)");
+						OutuputLine("Busted when marksAgainstUs == 2 (wtf)");
 						myGameScore = 0;
 						marksAgainstUs = 0;
 					}
@@ -113,16 +115,16 @@ namespace LogicTester
 					break;
 				}
 
-				//OutuputLine("New score " + score + " (+" + (score - previousScore) + ")");
+				OutuputLine("New score " + score + " (+" + (score - previousScore) + ")");
 
-				//Console.Write("Pick: ");
+				Console.Write("Pick: ");
 				while (diceQueue.Count > 0)
 				{
 					int dieValue = dice[diceQueue.Dequeue()].Value;
-				//		Console.Write(dieValue);
+						Console.Write(dieValue);
 					--diceToRoll;
 				}
-				//OutuputLine("");
+				OutuputLine("");
 
 				if (!rollAgain)
 				{

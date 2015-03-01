@@ -37,6 +37,7 @@ namespace Ragegast.Plugin.GreedyBot
 		/// UUIDs of the player lights to indicate the current turn.
 		/// </summary>
 		private UUID[] playerLightIds = new UUID[8] { UUID.Zero, UUID.Zero, UUID.Zero, UUID.Zero, UUID.Zero, UUID.Zero, UUID.Zero, UUID.Zero };
+		private UUID[] playerSeatIds = new UUID[8] { UUID.Zero, UUID.Zero, UUID.Zero, UUID.Zero, UUID.Zero, UUID.Zero, UUID.Zero, UUID.Zero };
 		/// <summary>
 		/// Index of player on game board. This index corresponds to an entry in 'playerLightIds'
 		/// </summary>
@@ -61,7 +62,8 @@ namespace Ragegast.Plugin.GreedyBot
 			       && diceRightId != UUID.Zero
 			       && gameButtonsId != UUID.Zero
 			       && scoreId != UUID.Zero
-			       && playerLightIds.All(n => n != UUID.Zero)
+				   && playerLightIds.All(n => n != UUID.Zero)
+				   && playerSeatIds.All(n => n != UUID.Zero)
 			       && PlayerIndex != -1;
 		}
 
@@ -101,6 +103,7 @@ namespace Ragegast.Plugin.GreedyBot
 			scoreId = UUID.Zero;
 			tableId = UUID.Zero;
 			playerLightIds = new UUID[playerLightIds.Length];
+			playerSeatIds = new UUID[playerSeatIds.Length];
 			PlayerIndex = -1;
 
 			gameDice.Reset();
@@ -152,11 +155,41 @@ namespace Ragegast.Plugin.GreedyBot
 
 				playerLightIds[seatId - 1] = props.ObjectID;
 			}
+			else if (props.Name.StartsWith("Game Player"))
+			{
+				if (props.Description.Length == 0)
+				{
+					return;
+				}
+
+				int seatId = props.Description[0] - '0';
+				if (seatId < 1 || seatId > 8)
+				{
+					return;
+				}
+
+				if (props.Name == "Game Player (" + GreedyBotPlugin.Instance.Client.Self.Name + ")")
+				{
+					PlayerIndex = seatId - 1;
+					Utils.OutputLine("CheckPropsForGameComponents: We're player #" + PlayerIndex, Utils.OutputLevel.Game);
+				}
+				else if (props.Name != "Game Player (empty)")
+				{
+					
+				}
+				else
+				{
+
+				}
+				Utils.OutputLine("Update player seat #" + seatId + " -> " + props.Name, Utils.OutputLevel.Game);
+
+				playerSeatIds[seatId - 1] = props.ObjectID;
+			}
 		}
 
 		public void Objects_TerseObjectUpdate(object sender, TerseObjectUpdateEventArgs e)
 		{
-			if (e.Prim.ID == diceLeftId)
+			if (diceLeftId != UUID.Zero && e.Prim.ID == diceLeftId)
 			{
 				if (e.Update.Textures == null)
 				{
@@ -165,7 +198,7 @@ namespace Ragegast.Plugin.GreedyBot
 				gameDice.OnDiceFaceUpdate(true, e.Update.Textures);
 				return;
 			}
-			if (e.Prim.ID == diceRightId)
+			if (diceRightId != UUID.Zero && e.Prim.ID == diceRightId)
 			{
 				if (e.Update.Textures == null)
 				{
@@ -174,7 +207,7 @@ namespace Ragegast.Plugin.GreedyBot
 				gameDice.OnDiceFaceUpdate(false, e.Update.Textures);
 				return;
 			}
-			if (e.Prim.ID == scoreId)
+			if (scoreId != UUID.Zero && e.Prim.ID == scoreId)
 			{
 				if (e.Update.Textures == null)
 				{
@@ -238,25 +271,7 @@ namespace Ragegast.Plugin.GreedyBot
 			//	return;
 			//}
 
-			if (e.Properties.Name.StartsWith("Game Player"))
-			{
-				if (e.Properties.Description.Length == 0)
-				{
-					return;
-				}
 
-				int seatId = e.Properties.Description[0] - '0';
-				if (seatId < 1 || seatId > 8)
-				{
-					return;
-				}
-
-				if (e.Properties.Name == "Game Player (" + GreedyBotPlugin.Instance.Client.Self.Name + ")")
-				{
-					PlayerIndex = seatId - 1;
-					Utils.OutputLine("CheckPropsForGameComponents: We're player #" + PlayerIndex, Utils.OutputLevel.Game);
-				}
-			}
 
 			CheckPropsForGameComponents(e.Properties);
 			if (HasFoundAllGameComponents())

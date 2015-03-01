@@ -7,3 +7,5 @@ compile.bat
 *.bak
 *~
 *.userprefs
+/RadegastPlugins/Radegast.Plugin.Creeper
+/RadegastPlugins/Radegast.Plugin.DialogChannelViewer

@@ -104,18 +104,13 @@ namespace Ragegast.Plugin.GreedyBot
 		// TODO: TEMP!
 		private UUID sitTargetGame = new UUID("011cc6df-9d87-eb41-9127-0a6ecdd4561b");
 
-		public void StopPlugin(RadegastInstance inst)
-		{
-			ThreadPool.Instance.KillPreviousThread();
+		private UUID soundBust = new UUID("3deb1f4a-0f54-bafe-4101-7ae0816fd13f");
+		private UUID soundRoll = new UUID("2b07b90c-f882-ad32-3646-4a021c5e3d72");
+		private UUID soundAchievement = new UUID("6cf517c2-885d-2ed7-ebb1-aa22a5bb6134");
+		private UUID soundClick = new UUID("8eae9c2b-3caa-477c-964d-c3752c23eddb");
+		private UUID soundZilchWarningStartTurn = new UUID("4cb5b43f-1f75-38d9-fb70-849bdd706429");
+		private UUID soundZilchWarningBustedTwice = new UUID("41f44567-cb05-890c-f0d0-869188c702a4");
 
-			inst.Client.Self.IM -= Self_IM;
-			inst.Client.Objects.TerseObjectUpdate -= Objects_TerseObjectUpdate;
-			inst.Client.Self.ChatFromSimulator -= Self_ChatFromSimulator;
-			inst.Client.Objects.ObjectProperties -= Objects_ObjectProperties;
-			inst.Client.Self.AvatarSitResponse -= Self_AvatarSitResponse;
-			inst.Client.Objects.ObjectPropertiesFamily -= Objects_ObjectPropertiesFamily;
-			inst.Client.Objects.AvatarSitChanged -= Objects_AvatarSitChanged;
-		}
 
 		public void StartPlugin(RadegastInstance inst)
 		{
@@ -130,7 +125,48 @@ namespace Ragegast.Plugin.GreedyBot
 			inst.Client.Self.AvatarSitResponse += Self_AvatarSitResponse;
 			inst.Client.Objects.ObjectPropertiesFamily += Objects_ObjectPropertiesFamily;
 			inst.Client.Objects.AvatarSitChanged += Objects_AvatarSitChanged;
+
+			inst.Client.Sound.SoundTrigger += Sound_SoundTrigger;
 		}
+
+		public void StopPlugin(RadegastInstance inst)
+		{
+			ThreadPool.Instance.KillPreviousThread();
+
+			inst.Client.Self.IM -= Self_IM;
+			inst.Client.Objects.TerseObjectUpdate -= Objects_TerseObjectUpdate;
+			inst.Client.Self.ChatFromSimulator -= Self_ChatFromSimulator;
+			inst.Client.Objects.ObjectProperties -= Objects_ObjectProperties;
+			inst.Client.Self.AvatarSitResponse -= Self_AvatarSitResponse;
+			inst.Client.Objects.ObjectPropertiesFamily -= Objects_ObjectPropertiesFamily;
+			inst.Client.Objects.AvatarSitChanged -= Objects_AvatarSitChanged;
+
+			// TODO: Trigger 'roll' on Stop -> score changed
+			// TODO: Trigger 'roll' on Roll -> busted! plays
+			inst.Client.Sound.SoundTrigger -= Sound_SoundTrigger;
+		}
+
+
+		void Sound_SoundTrigger(object sender, SoundTriggerEventArgs e)
+		{
+			if (e.ObjectID != gameComponents.tableId)
+			{
+				return;
+			}
+
+			if (e.SoundID == soundBust)
+			{
+				Utils.OutputLine("BUST sound played from: " + e.ObjectID.ToString(), Utils.OutputLevel.Game);
+			}
+			else if (e.SoundID == soundRoll)
+			{
+				Utils.OutputLine("Dice roll sound played from: " + e.ObjectID.ToString(), Utils.OutputLevel.Game);
+			}
+
+			Utils.OutputLine("Object " + e.ObjectID.ToString() + " plays sound " + e.SoundID, Utils.OutputLevel.Game);
+		}
+
+
 
 		private void ToggleSeat()
 		{
@@ -564,6 +600,18 @@ namespace Ragegast.Plugin.GreedyBot
 					//   for now we just keep trying to roll until we either exceed the opponets score or bust.
 					Utils.OutputLine("MSG 3: End of game must keep rolling till we win or bust - scheduling roll", Utils.OutputLevel.Game);
 					ClickRoll();
+				}
+				else if (e.Message.EndsWith(" has left the game."))
+				{
+					// TODO: Check to see if we're the last player?
+				}
+				else if (e.Message.EndsWith(" has joined the game."))
+				{
+					// TODO: Check to see if we're the only player?
+				}
+				else if (e.Message.StartsWith("Welcome to the game,"))
+				{
+					// TODO: do anything?
 				}
 			}
 		}
