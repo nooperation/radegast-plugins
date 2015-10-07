@@ -21,6 +21,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Radegast.Plugin.PrimScanner
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Radegast.Plugin.TimerExample", "Radegast.Plugin.TimerExample\Radegast.Plugin.TimerExample.csproj", "{683FEB69-FFDC-45B4-BC16-9B61F8D2663B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Radegast.Plugin.FollowDistance", "Radegast.Plugin.FollowDistance\Radegast.Plugin.FollowDistance.csproj", "{38C45EC7-5236-4BC0-9990-08120ED0C28F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -101,6 +103,14 @@ Global
 		{683FEB69-FFDC-45B4-BC16-9B61F8D2663B}.Release|Any CPU.Build.0 = Release|Any CPU
 		{683FEB69-FFDC-45B4-BC16-9B61F8D2663B}.Release|x86.ActiveCfg = Release|x86
 		{683FEB69-FFDC-45B4-BC16-9B61F8D2663B}.Release|x86.Build.0 = Release|x86
+		{38C45EC7-5236-4BC0-9990-08120ED0C28F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{38C45EC7-5236-4BC0-9990-08120ED0C28F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{38C45EC7-5236-4BC0-9990-08120ED0C28F}.Debug|x86.ActiveCfg = Debug|x86
+		{38C45EC7-5236-4BC0-9990-08120ED0C28F}.Debug|x86.Build.0 = Debug|x86
+		{38C45EC7-5236-4BC0-9990-08120ED0C28F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{38C45EC7-5236-4BC0-9990-08120ED0C28F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{38C45EC7-5236-4BC0-9990-08120ED0C28F}.Release|x86.ActiveCfg = Release|x86
+		{38C45EC7-5236-4BC0-9990-08120ED0C28F}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
