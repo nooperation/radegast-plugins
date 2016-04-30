@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2013
-VisualStudioVersion = 12.0.31101.0
+# Visual Studio 14
+VisualStudioVersion = 14.0.25123.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Radegast.Plugin.ChatNotifier", "Radegast.Plugin.ChatNotifier\Radegast.Plugin.ChatNotifier.csproj", "{D5DC4698-F0FF-471C-80A8-190D7B7E7BF8}"
 EndProject
@@ -22,6 +22,10 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Radegast.Plugin.TimerExample", "Radegast.Plugin.TimerExample\Radegast.Plugin.TimerExample.csproj", "{683FEB69-FFDC-45B4-BC16-9B61F8D2663B}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Radegast.Plugin.FollowDistance", "Radegast.Plugin.FollowDistance\Radegast.Plugin.FollowDistance.csproj", "{38C45EC7-5236-4BC0-9990-08120ED0C28F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Radegast.Plugin.ParcelScanner", "Radegast.Plugin.ParcelScanner\Radegast.Plugin.ParcelScanner.csproj", "{DF6A9B51-519E-4087-BBC4-36908E08961D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Radegast.Plugin.GroupChatNotifier", "Radegast.Plugin.GroupChatNotifier\Radegast.Plugin.GroupChatNotifier.csproj", "{E2C66808-0B85-4773-861B-AB19C93A3664}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -111,6 +115,22 @@ Global
 		{38C45EC7-5236-4BC0-9990-08120ED0C28F}.Release|Any CPU.Build.0 = Release|Any CPU
 		{38C45EC7-5236-4BC0-9990-08120ED0C28F}.Release|x86.ActiveCfg = Release|x86
 		{38C45EC7-5236-4BC0-9990-08120ED0C28F}.Release|x86.Build.0 = Release|x86
+		{DF6A9B51-519E-4087-BBC4-36908E08961D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DF6A9B51-519E-4087-BBC4-36908E08961D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DF6A9B51-519E-4087-BBC4-36908E08961D}.Debug|x86.ActiveCfg = Debug|x86
+		{DF6A9B51-519E-4087-BBC4-36908E08961D}.Debug|x86.Build.0 = Debug|x86
+		{DF6A9B51-519E-4087-BBC4-36908E08961D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DF6A9B51-519E-4087-BBC4-36908E08961D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DF6A9B51-519E-4087-BBC4-36908E08961D}.Release|x86.ActiveCfg = Release|x86
+		{DF6A9B51-519E-4087-BBC4-36908E08961D}.Release|x86.Build.0 = Release|x86
+		{E2C66808-0B85-4773-861B-AB19C93A3664}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E2C66808-0B85-4773-861B-AB19C93A3664}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E2C66808-0B85-4773-861B-AB19C93A3664}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{E2C66808-0B85-4773-861B-AB19C93A3664}.Debug|x86.Build.0 = Debug|Any CPU
+		{E2C66808-0B85-4773-861B-AB19C93A3664}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E2C66808-0B85-4773-861B-AB19C93A3664}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E2C66808-0B85-4773-861B-AB19C93A3664}.Release|x86.ActiveCfg = Release|Any CPU
+		{E2C66808-0B85-4773-861B-AB19C93A3664}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
