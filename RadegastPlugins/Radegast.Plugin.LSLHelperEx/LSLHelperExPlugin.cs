@@ -112,7 +112,6 @@ namespace Radegast.Plugin.LSLHelperEx
                             UUID gesture_uuid;
                             if(UUID.TryParse(gesture_name, out gesture_uuid))
                             {
-                                Output("Playing gesture: " + gesture_name);
                                 instance.Client.Self.PlayGesture(gesture_uuid);
                                 return true;
                             }
