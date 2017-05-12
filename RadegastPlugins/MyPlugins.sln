@@ -29,6 +29,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Radegast.Plugin.GroupChatNo
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Radegast.Plugin.ReconnectPlugin", "Radegast.Plugin.ReconnectPlugin\Radegast.Plugin.ReconnectPlugin.csproj", "{DCA3C963-F4AD-42B3-B8AB-2DBF2104074C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Radegast.Plugin.DisconnectInfo", "Radegast.Plugin.DisconnectInfo\Radegast.Plugin.DisconnectInfo.csproj", "{D7B7620E-F5EA-41F9-A182-C75E0B9B285D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -141,6 +143,14 @@ Global
 		{DCA3C963-F4AD-42B3-B8AB-2DBF2104074C}.Release|Any CPU.Build.0 = Release|Any CPU
 		{DCA3C963-F4AD-42B3-B8AB-2DBF2104074C}.Release|x86.ActiveCfg = Release|Any CPU
 		{DCA3C963-F4AD-42B3-B8AB-2DBF2104074C}.Release|x86.Build.0 = Release|Any CPU
+		{D7B7620E-F5EA-41F9-A182-C75E0B9B285D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D7B7620E-F5EA-41F9-A182-C75E0B9B285D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D7B7620E-F5EA-41F9-A182-C75E0B9B285D}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{D7B7620E-F5EA-41F9-A182-C75E0B9B285D}.Debug|x86.Build.0 = Debug|Any CPU
+		{D7B7620E-F5EA-41F9-A182-C75E0B9B285D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D7B7620E-F5EA-41F9-A182-C75E0B9B285D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D7B7620E-F5EA-41F9-A182-C75E0B9B285D}.Release|x86.ActiveCfg = Release|Any CPU
+		{D7B7620E-F5EA-41F9-A182-C75E0B9B285D}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
