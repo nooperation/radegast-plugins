@@ -50,16 +50,16 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="OpenMetaverse">
-      <HintPath>..\..\..\radegast\radegast\bin\OpenMetaverse.dll</HintPath>
+      <HintPath>..\..\..\radegast\bin\OpenMetaverse.dll</HintPath>
     </Reference>
     <Reference Include="OpenMetaverse.StructuredData">
-      <HintPath>..\..\..\radegast\radegast\bin\OpenMetaverse.StructuredData.dll</HintPath>
+      <HintPath>..\..\..\radegast\bin\OpenMetaverse.StructuredData.dll</HintPath>
     </Reference>
     <Reference Include="OpenMetaverseTypes">
-      <HintPath>..\..\..\radegast\radegast\bin\OpenMetaverseTypes.dll</HintPath>
+      <HintPath>..\..\..\radegast\bin\OpenMetaverseTypes.dll</HintPath>
     </Reference>
     <Reference Include="Radegast">
-      <HintPath>..\..\..\radegast\radegast\bin\Radegast.exe</HintPath>
+      <HintPath>..\..\..\radegast\bin\Radegast.exe</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -71,7 +71,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="FollowDistancePlugin.cs" />
+    <Compile Include="FixAutositAlert.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

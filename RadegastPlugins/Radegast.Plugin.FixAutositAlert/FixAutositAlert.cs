@@ -10,12 +10,11 @@ namespace Radegast.Plugin.FixAutositAlertPlugin
     {
         private RadegastInstance _instance;
         private Timer _mainTimer;
-        private bool _isAutositEnabled = false;
 
         public void StartPlugin(RadegastInstance inst)
         {
             _mainTimer = new Timer();
-            _mainTimer.Interval = 5000;
+            _mainTimer.Interval = 1000;
             _mainTimer.Tick += mainTimer_Tick;
             _mainTimer.Start();
             _instance = inst;
@@ -39,18 +38,9 @@ namespace Radegast.Plugin.FixAutositAlertPlugin
             }
 
             var preferences = (AutoSitPreferences)_instance.ClientSettings["AutoSit"];
-            if (preferences.Enabled)
+            if (preferences.Primitive != UUID.Zero)
             {
-                _isAutositEnabled = true;
-                if (IsSitonTargetInCurrentRegion() == false)
-                {
-                    preferences.Enabled = false;
-                    _instance.ClientSettings["AutoSit"] = preferences;
-                }
-            }
-            else if (_isAutositEnabled && IsSitonTargetInCurrentRegion())
-            {
-                preferences.Enabled = true;
+                preferences.Enabled = IsSitonTargetInCurrentRegion();
                 _instance.ClientSettings["AutoSit"] = preferences;
             }
         }
