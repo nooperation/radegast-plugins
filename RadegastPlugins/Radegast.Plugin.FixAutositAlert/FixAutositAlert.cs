@@ -11,6 +11,11 @@ namespace Radegast.Plugin.FixAutositAlertPlugin
         private RadegastInstance _instance;
         private Timer _mainTimer;
 
+        private void Output(string message)
+        {
+            _instance.TabConsole.DisplayNotificationInChat(message, ChatBufferTextStyle.StatusBlue);
+        }
+
         public void StartPlugin(RadegastInstance inst)
         {
             _mainTimer = new Timer();
@@ -22,26 +27,59 @@ namespace Radegast.Plugin.FixAutositAlertPlugin
 
         bool IsSitonTargetInCurrentRegion()
         {
-            if (_instance.State.AutoSit.Preferences.Primitive == UUID.Zero)
+            if(_instance == null || 
+                _instance.State == null ||
+                _instance.State.AutoSit == null ||
+                _instance.State.AutoSit.Preferences == null ||
+                _instance.State.AutoSit.Preferences.Primitive == UUID.Zero)
             {
                 return false;
             }
+
+            if (_instance.Client == null ||
+               _instance.Client.Network == null ||
+               _instance.Client.Network.CurrentSim == null ||
+               _instance.Client.Network.CurrentSim.ObjectsPrimitives == null)
+            {
+                return false;
+            }
+
             var primToSitOn = _instance.Client.Network.CurrentSim.ObjectsPrimitives.Find(n => n.ID == _instance.State.AutoSit.Preferences.Primitive);
             return primToSitOn != null;
         }
 
         void mainTimer_Tick(object sender, EventArgs e)
         {
-            if (!_instance.Client.Network.Connected)
+            try
             {
-                return;
-            }
+                if (!_instance.Client.Network.Connected)
+                {
+                    return;
+                }
 
-            var preferences = (AutoSitPreferences)_instance.ClientSettings["AutoSit"];
-            if (preferences.Primitive != UUID.Zero)
+                var preferences = (AutoSitPreferences)_instance.ClientSettings["AutoSit"];
+                if (preferences.Primitive != UUID.Zero)
+                {
+                    var wasAutositEnabled = preferences.Enabled;
+                    preferences.Enabled = IsSitonTargetInCurrentRegion();
+                    _instance.ClientSettings["AutoSit"] = preferences;
+
+                    if (wasAutositEnabled != preferences.Enabled)
+                    {
+                        if (preferences.Enabled)
+                        {
+                            Output("Enabled autosit");
+                        }
+                        else
+                        {
+                            Output("Disabled autosit");
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
             {
-                preferences.Enabled = IsSitonTargetInCurrentRegion();
-                _instance.ClientSettings["AutoSit"] = preferences;
+                Output("Exception: " + ex.Message);
             }
         }
 
