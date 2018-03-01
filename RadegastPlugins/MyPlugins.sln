@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26430.16
+VisualStudioVersion = 15.0.27130.2036
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Radegast.Plugin.ChatNotifier", "Radegast.Plugin.ChatNotifier\Radegast.Plugin.ChatNotifier.csproj", "{D5DC4698-F0FF-471C-80A8-190D7B7E7BF8}"
 EndProject
@@ -32,6 +32,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Radegast.Plugin.DisconnectInfo", "Radegast.Plugin.DisconnectInfo\Radegast.Plugin.DisconnectInfo.csproj", "{D7B7620E-F5EA-41F9-A182-C75E0B9B285D}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Radegast.Plugin.FixAutositAlert", "Radegast.Plugin.FixAutositAlert\Radegast.Plugin.FixAutositAlert.csproj", "{F54B7AC6-FFA5-4794-A744-A146DA0CD916}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Radegast.Plugin.IgnoreSpamPlugin", "Radegast.Plugin.IgnoreSpam\Radegast.Plugin.IgnoreSpamPlugin.csproj", "{E9AB93C0-25E8-4FD6-A036-1075B3A40BB6}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -161,8 +163,19 @@ Global
 		{F54B7AC6-FFA5-4794-A744-A146DA0CD916}.Release|Any CPU.Build.0 = Release|Any CPU
 		{F54B7AC6-FFA5-4794-A744-A146DA0CD916}.Release|x86.ActiveCfg = Release|x86
 		{F54B7AC6-FFA5-4794-A744-A146DA0CD916}.Release|x86.Build.0 = Release|x86
+		{E9AB93C0-25E8-4FD6-A036-1075B3A40BB6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E9AB93C0-25E8-4FD6-A036-1075B3A40BB6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E9AB93C0-25E8-4FD6-A036-1075B3A40BB6}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{E9AB93C0-25E8-4FD6-A036-1075B3A40BB6}.Debug|x86.Build.0 = Debug|Any CPU
+		{E9AB93C0-25E8-4FD6-A036-1075B3A40BB6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E9AB93C0-25E8-4FD6-A036-1075B3A40BB6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E9AB93C0-25E8-4FD6-A036-1075B3A40BB6}.Release|x86.ActiveCfg = Release|Any CPU
+		{E9AB93C0-25E8-4FD6-A036-1075B3A40BB6}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {9990817E-53B6-40FC-AB11-7662826D249C}
 	EndGlobalSection
 EndGlobal
