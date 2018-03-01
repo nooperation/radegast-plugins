@@ -24,7 +24,7 @@ namespace Radegast.Plugin.IgnoreSpamPlugin
             {
                 if (Instance.Groups.ContainsKey(e.IM.IMSessionID) == false)
                 {
-                    Output("Group chat from secondlife:///app/agent/" + e.IM.FromAgentID + "/about : " + e.IM.Message);
+                    Output("Conference from secondlife:///app/agent/" + e.IM.FromAgentID + "/about : " + e.IM.Message);
                     var tab = Instance.TabConsole.GetTab(e.IM.IMSessionID.ToString());
                     if (tab != null)
                     {
